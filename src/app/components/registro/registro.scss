@@ -1,0 +1,150 @@
+.centered-layout {
+  background-color: var(--bg-page);
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .form-panel {
+    flex: 0 1 100%;
+    background: transparent;
+    padding: 3rem 1.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .registro-card {
+    max-width: 680px;
+    padding: 2.5rem 2.75rem;
+
+    @media (max-width: 600px) {
+      padding: 1.75rem 1.25rem;
+    }
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    .form-brand-logo {
+      display: block;
+      max-height: 56px;
+      width: auto;
+      max-width: 220px;
+      object-fit: contain;
+      margin: 0 auto 1rem auto;
+    }
+  }
+}
+
+.file-upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: var(--bg-page);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  margin-bottom: 0 !important;
+
+  &:hover {
+    border-color: var(--brand-secondary);
+    background-color: var(--brand-secondary-soft);
+  }
+
+  &.input-error {
+    border-color: var(--color-error);
+    background-color: var(--color-error-bg);
+  }
+
+  input[type='file'] {
+    display: none;
+  }
+
+  .upload-placeholder {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--brand-secondary);
+    padding: 0.35rem 0;
+  }
+
+  .image-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+
+    img {
+      width: 96px;
+      height: 96px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid var(--brand-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .change-image-text {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+  }
+}
+
+.birthdate-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.45fr 1.1fr; // Día | Mes (más ancho) | Año
+  gap: 0.75rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+
+  // Flecha minimalista personalizada
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0.9rem;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
+    transform: translateY(-65%) rotate(45deg);
+    pointer-events: none;
+    transition: border-color 0.2s ease;
+  }
+
+  &:focus-within::after {
+    border-color: var(--brand-secondary);
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.25rem !important; // Espacio para la flecha
+    cursor: pointer;
+    background-color: var(--bg-surface);
+  }
+}

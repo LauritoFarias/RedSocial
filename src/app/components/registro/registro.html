@@ -1,0 +1,304 @@
+<div class="login-wrapper centered-layout">
+
+  @if (successMessage()) {
+    <div class="toast-success" role="status" aria-live="polite">
+      <span class="toast-icon">✔</span>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  <section class="form-panel">
+    <div class="form-card registro-card">
+
+      <header class="form-header">
+        <img src="assets/images/logo.png" alt="Retro Vibes" class="form-brand-logo" />
+        <h2>Crear una cuenta</h2>
+        <p>Unite a la comunidad Retro Vibes.</p>
+      </header>
+
+      @if (errorMessage()) {
+        <div class="alert-error">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form
+        [formGroup]="registroForm"
+        (ngSubmit)="onSubmit()"
+        novalidate
+      >
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              id="nombre"
+              type="text"
+              formControlName="nombre"
+              placeholder="Tu nombre"
+              autocomplete="given-name"
+              [class.input-error]="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched"
+            />
+
+            @if (registroForm.get('nombre')?.touched && registroForm.get('nombre')?.hasError('required')) {
+              <span class="field-error">El nombre es obligatorio.</span>
+            }
+            @if (registroForm.get('nombre')?.touched && (registroForm.get('nombre')?.hasError('minlength') || registroForm.get('nombre')?.hasError('maxlength') || registroForm.get('nombre')?.hasError('pattern'))) {
+              <span class="field-error">Ingresá un nombre válido de entre 2 y 50 caracteres.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <input
+              id="apellido"
+              type="text"
+              formControlName="apellido"
+              placeholder="Tu apellido"
+              autocomplete="family-name"
+              [class.input-error]="registroForm.get('apellido')?.invalid && registroForm.get('apellido')?.touched"
+            />
+
+            @if (registroForm.get('apellido')?.touched && registroForm.get('apellido')?.hasError('required')) {
+              <span class="field-error">El apellido es obligatorio.</span>
+            }
+            @if (registroForm.get('apellido')?.touched && (registroForm.get('apellido')?.hasError('minlength') || registroForm.get('apellido')?.hasError('maxlength') || registroForm.get('apellido')?.hasError('pattern'))) {
+              <span class="field-error">Ingresá un apellido válido de entre 2 y 50 caracteres.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="ejemplo@correo.com"
+              autocomplete="email"
+              [class.input-error]="registroForm.get('email')?.invalid && registroForm.get('email')?.touched"
+            />
+
+            @if (registroForm.get('email')?.touched && registroForm.get('email')?.hasError('required')) {
+              <span class="field-error">El correo es obligatorio.</span>
+            }
+            @if (registroForm.get('email')?.touched && registroForm.get('email')?.hasError('email')) {
+              <span class="field-error">Ingresá un formato de correo válido.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="username">Nombre de usuario</label>
+            <input
+              id="username"
+              type="text"
+              formControlName="username"
+              placeholder="Tu nombre de usuario"
+              autocomplete="username"
+              [class.input-error]="registroForm.get('username')?.invalid && registroForm.get('username')?.touched"
+            />
+
+            @if (registroForm.get('username')?.touched && registroForm.get('username')?.hasError('required')) {
+              <span class="field-error">El nombre de usuario es obligatorio.</span>
+            }
+            @if (registroForm.get('username')?.touched && registroForm.get('username')?.hasError('pattern')) {
+              <span class="field-error">
+                Usá entre 3 y 20 caracteres: letras, números, puntos o guiones bajos.
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              placeholder="Contraseña"
+              autocomplete="new-password"
+              [class.input-error]="registroForm.get('password')?.invalid && registroForm.get('password')?.touched"
+            />
+
+            @if (registroForm.get('password')?.touched && registroForm.get('password')?.hasError('required')) {
+              <span class="field-error">La contraseña es obligatoria.</span>
+            }
+            @if (registroForm.get('password')?.touched && registroForm.get('password')?.hasError('pattern')) {
+              <span class="field-error">
+                Mínimo 8 caracteres, una mayúscula y un número.
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Repetir contraseña</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              formControlName="confirmPassword"
+              placeholder="Repetí la contraseña"
+              autocomplete="new-password"
+              [class.input-error]="(registroForm.get('confirmPassword')?.invalid || registroForm.hasError('passwordMismatch')) && registroForm.get('confirmPassword')?.touched"
+            />
+
+            @if (registroForm.get('confirmPassword')?.touched && registroForm.get('confirmPassword')?.hasError('required')) {
+              <span class="field-error">Repetir la contraseña es obligatorio.</span>
+            }
+            @if (registroForm.get('confirmPassword')?.touched && registroForm.hasError('passwordMismatch')) {
+              <span class="field-error">Las contraseñas no coinciden.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="birthDateLabel">Fecha de nacimiento</label>
+
+          <div class="birthdate-grid" role="group" aria-labelledby="birthDateLabel">
+            <!-- Selector de Día -->
+            <div class="select-wrapper">
+              <select
+                aria-label="Día de nacimiento"
+                [value]="selectedDay()"
+                (change)="onDatePartChange('day', $event)"
+                (blur)="markBirthDateTouched()"
+                [class.input-error]="registroForm.get('birthDate')?.invalid && registroForm.get('birthDate')?.touched"
+              >
+                <option value="" disabled>Día</option>
+                @for (d of availableDays(); track d) {
+                  <option [value]="d">{{ d }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Selector de Mes -->
+            <div class="select-wrapper">
+              <select
+                aria-label="Mes de nacimiento"
+                [value]="selectedMonth()"
+                (change)="onDatePartChange('month', $event)"
+                (blur)="markBirthDateTouched()"
+                [class.input-error]="registroForm.get('birthDate')?.invalid && registroForm.get('birthDate')?.touched"
+              >
+                <option value="" disabled>Mes</option>
+                @for (m of months; track m.value) {
+                  <option [value]="m.value">{{ m.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Selector de Año -->
+            <div class="select-wrapper">
+              <select
+                aria-label="Año de nacimiento"
+                [value]="selectedYear()"
+                (change)="onDatePartChange('year', $event)"
+                (blur)="markBirthDateTouched()"
+                [class.input-error]="registroForm.get('birthDate')?.invalid && registroForm.get('birthDate')?.touched"
+              >
+                <option value="" disabled>Año</option>
+                @for (y of years; track y) {
+                  <option [value]="y">{{ y }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          @if (registroForm.get('birthDate')?.touched && registroForm.get('birthDate')?.hasError('required')) {
+            <span class="field-error">Seleccioná el día, mes y año de tu nacimiento.</span>
+          }
+          @if (registroForm.get('birthDate')?.touched && registroForm.get('birthDate')?.hasError('futureDate')) {
+            <span class="field-error">La fecha no puede ser posterior al día de hoy.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="profileImage">Imagen de perfil</label>
+
+          <label
+            for="profileImage"
+            class="file-upload-box"
+            [class.input-error]="registroForm.get('profileImage')?.invalid && registroForm.get('profileImage')?.touched"
+          >
+            <input
+              id="profileImage"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              (change)="onImageSelected($event)"
+            />
+
+            @if (imagePreview()) {
+              <div class="image-preview-container">
+                <img [src]="imagePreview()" alt="Vista previa de perfil" />
+                <span class="change-image-text">Hacé clic para cambiar la imagen</span>
+              </div>
+            } @else {
+              <div class="upload-placeholder">
+                <span>Seleccionar archivo</span>
+              </div>
+            }
+          </label>
+
+          <span class="field-hint">
+            Formatos PNG, JPG, WEBP o GIF. Máximo 5 MB.
+          </span>
+
+          @if (registroForm.get('profileImage')?.touched && registroForm.get('profileImage')?.hasError('required')) {
+            <span class="field-error">La imagen de perfil es obligatoria.</span>
+          }
+          @if (registroForm.get('profileImage')?.hasError('imageType')) {
+            <span class="field-error">El archivo debe ser una imagen válida.</span>
+          }
+          @if (registroForm.get('profileImage')?.hasError('imageSize')) {
+            <span class="field-error">La imagen no puede superar los 5 MB.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción breve</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Contanos algo sobre vos..."
+            rows="3"
+            maxlength="350"
+            [class.input-error]="registroForm.get('description')?.invalid && registroForm.get('description')?.touched"
+          ></textarea>
+
+          <span class="field-hint">
+            {{ registroForm.get('description')?.value?.length || 0 }}/350 caracteres
+          </span>
+
+          @if (registroForm.get('description')?.touched && registroForm.get('description')?.hasError('required')) {
+            <span class="field-error">La descripción es obligatoria.</span>
+          }
+          @if (registroForm.get('description')?.hasError('maxlength')) {
+            <span class="field-error">La descripción no puede superar los 350 caracteres.</span>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span>Creando cuenta...</span>
+          } @else {
+            <span>Registrarme</span>
+          }
+        </button>
+
+      </form>
+
+      <footer class="form-footer">
+        <p>¿Ya tenés una cuenta?</p>
+        <a routerLink="/login" class="btn-secondary">
+          Iniciar sesión
+        </a>
+      </footer>
+
+    </div>
+  </section>
+</div>
