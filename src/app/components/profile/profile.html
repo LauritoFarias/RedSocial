@@ -1,0 +1,446 @@
+@if (!paginaLista()) {
+  <div class="feed-initial-loader" role="status" aria-label="Cargando perfil">
+    <div class="retro-spinner"></div>
+  </div>
+} @else {
+  @if (mensajeExito()) {
+    <div class="toast-success" role="status" aria-live="polite">
+      <span class="toast-icon">✔</span>
+      <span>{{ mensajeExito() }}</span>
+    </div>
+  }
+
+  <!-- HEADER STICKY GLOBAL -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a routerLink="/feed" class="brand-link">
+        <span class="brand-dot"></span>
+        <span class="brand-title">Retro Vibes</span>
+      </a>
+
+      <div class="header-actions">
+        <a routerLink="/feed" class="btn-new-post-sm">
+          ← Ir al Feed
+        </a>
+
+        <div class="user-menu-wrapper">
+          <button
+            type="button"
+            class="avatar-trigger"
+            (click)="toggleMenuUsuario($event)"
+            aria-label="Menú de usuario">
+            <img
+              [src]="avatarUsuarioActual()"
+              [alt]="usuarioActual()?.username || 'Usuario'"
+            />
+          </button>
+
+          @if (menuUsuarioAbierto()) {
+            <div class="user-dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-user-info">
+                <strong>{{ usuarioActual()?.nombre }}</strong>
+                <span>&#64;{{ usuarioActual()?.username }}</span>
+              </div>
+              <hr />
+              <a routerLink="/perfil" class="dropdown-item" (click)="cerrarMenuUsuario()">
+                Ver perfil
+              </a>
+              <button type="button" class="dropdown-item dropdown-logout" (click)="cerrarSesion()">
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO DE MI PERFIL -->
+  <main class="profile-page" (click)="cerrarMenuUsuario()">
+    <div class="profile-container">
+
+      <!-- 1. TARJETA DE DATOS DEL USUARIO (Sin correo ni tipo de usuario) -->
+      @if (usuarioActual(); as user) {
+        <section class="profile-card">
+          <div class="profile-banner"></div>
+
+          <div class="profile-body">
+            <div class="profile-top-row">
+              <div class="profile-avatar-wrapper">
+                <img
+                  [src]="avatarUsuarioActual()"
+                  [alt]="user.username"
+                  class="profile-avatar"
+                />
+                <button
+                  type="button"
+                  class="btn-edit-avatar"
+                  (click)="abrirModalEditar('imagen')"
+                  title="Cambiar foto de perfil">
+                  ✎
+                </button>
+              </div>
+
+              <button
+                type="button"
+                class="btn-change-password"
+                (click)="abrirModalEditar('password')">
+                🔒 Cambiar contraseña
+              </button>
+            </div>
+
+            <!-- Grilla de propiedades editables del usuario -->
+            <div class="profile-fields-list">
+              <!-- Nombre -->
+              <div class="profile-field-row" (click)="abrirModalEditar('nombre')">
+                <div class="field-info">
+                  <span class="field-label">Nombre</span>
+                  <strong class="field-value">{{ user.nombre }}</strong>
+                </div>
+                <span class="btn-edit-inline">Editar ✎</span>
+              </div>
+
+              <!-- Apellido -->
+              <div class="profile-field-row" (click)="abrirModalEditar('apellido')">
+                <div class="field-info">
+                  <span class="field-label">Apellido</span>
+                  <strong class="field-value">{{ user.apellido }}</strong>
+                </div>
+                <span class="btn-edit-inline">Editar ✎</span>
+              </div>
+
+              <!-- Nombre de usuario -->
+              <div class="profile-field-row" (click)="abrirModalEditar('username')">
+                <div class="field-info">
+                  <span class="field-label">Nombre de usuario</span>
+                  <strong class="field-value username-val">&#64;{{ user.username }}</strong>
+                </div>
+                <span class="btn-edit-inline">Editar ✎</span>
+              </div>
+
+              <!-- Fecha de nacimiento -->
+              <div class="profile-field-row" (click)="abrirModalEditar('fechaNacimiento')">
+                <div class="field-info">
+                  <span class="field-label">Fecha de nacimiento</span>
+                  <strong class="field-value">
+                    @if (user.fechaNacimiento) {
+                      {{ user.fechaNacimiento | date:'dd/MM/yyyy':'UTC' }}
+                    } @else {
+                      Sin especificar
+                    }
+                  </strong>
+                </div>
+                <span class="btn-edit-inline">Editar ✎</span>
+              </div>
+
+              <!-- Descripción -->
+              <div class="profile-field-row full-width" (click)="abrirModalEditar('descripcion')">
+                <div class="field-info">
+                  <span class="field-label">Descripción breve</span>
+                  <p class="field-desc">{{ user.descripcion || 'Sin descripción.' }}</p>
+                </div>
+                <span class="btn-edit-inline">Editar ✎</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- 2. ÚLTIMAS 3 PUBLICACIONES DEL USUARIO -->
+      <section class="profile-posts-section">
+        <div class="section-title-bar">
+          <h2>Últimas publicaciones</h2>
+          <span class="posts-subtitle">Mostrando las 3 más recientes</span>
+        </div>
+
+        <div class="posts-list">
+          @for (item of ultimosPosts(); track item._id) {
+            <app-post-card
+              [post]="item"
+              [currentUserId]="currentUserId()"
+              [esAdmin]="esAdmin()"
+              (likeToggled)="manejarLike($event)"
+              (deleted)="manejarEliminacion($event)"
+            />
+          } @empty {
+            <div class="profile-empty-posts">
+              <h3>Todavía no realizaste publicaciones</h3>
+              <p>Cuando compartas algo en el feed, tus últimas 3 publicaciones aparecerán aquí.</p>
+              <a routerLink="/feed" class="btn-primary">Ir al Feed a publicar</a>
+            </div>
+          }
+        </div>
+      </section>
+
+    </div>
+  </main>
+}
+
+<!-- MODAL DE EDICIÓN DE CAMPO + CONFIRMACIÓN DE CAMBIOS -->
+@if (campoEditando(); as campo) {
+  <div class="modal-backdrop" (click)="cerrarModalEditar()">
+    <div class="modal-card profile-edit-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ tituloModal() }}</h2>
+        <button type="button" class="btn-close-modal" (click)="cerrarModalEditar()" aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
+
+      @if (errorEdicion()) {
+        <div class="alert-error">{{ errorEdicion() }}</div>
+      }
+
+      <!-- PASO 1: FORMULARIO PEQUEÑO DEL DATO A CAMBIAR -->
+      @if (!confirmandoCambio()) {
+        <form [formGroup]="editForm" (ngSubmit)="avanzarAConfirmacion()" novalidate>
+
+          <!-- Nombre o Apellido -->
+          @if (campo === 'nombre' || campo === 'apellido') {
+            <div class="form-group">
+              <label for="valorTexto">{{ campo === 'nombre' ? 'Nuevo nombre' : 'Nuevo apellido' }}</label>
+              <input
+                id="valorTexto"
+                type="text"
+                formControlName="valorTexto"
+                [placeholder]="campo === 'nombre' ? 'Tu nombre' : 'Tu apellido'"
+                [class.input-error]="editForm.get('valorTexto')?.invalid && editForm.get('valorTexto')?.touched"
+              />
+              @if (editForm.get('valorTexto')?.touched && editForm.get('valorTexto')?.hasError('required')) {
+                <span class="field-error">Este campo es obligatorio.</span>
+              }
+              @if (editForm.get('valorTexto')?.touched && (editForm.get('valorTexto')?.hasError('minlength') || editForm.get('valorTexto')?.hasError('maxlength') || editForm.get('valorTexto')?.hasError('pattern'))) {
+                <span class="field-error">Ingresá un valor válido de entre 2 y 50 caracteres (solo letras).</span>
+              }
+            </div>
+          }
+
+          <!-- Username -->
+          @if (campo === 'username') {
+            <div class="form-group">
+              <label for="valorUsername">Nuevo nombre de usuario</label>
+              <input
+                id="valorUsername"
+                type="text"
+                formControlName="valorTexto"
+                placeholder="Tu nombre de usuario"
+                [class.input-error]="editForm.get('valorTexto')?.invalid && editForm.get('valorTexto')?.touched"
+              />
+              @if (editForm.get('valorTexto')?.touched && editForm.get('valorTexto')?.hasError('required')) {
+                <span class="field-error">El nombre de usuario es obligatorio.</span>
+              }
+              @if (editForm.get('valorTexto')?.touched && editForm.get('valorTexto')?.hasError('pattern')) {
+                <span class="field-error">Usá entre 3 y 20 caracteres: letras, números, puntos o guiones bajos.</span>
+              }
+            </div>
+          }
+
+          <!-- Descripción -->
+          @if (campo === 'descripcion') {
+            <div class="form-group">
+              <label for="valorDesc">Nueva descripción breve</label>
+              <textarea
+                id="valorDesc"
+                rows="3"
+                maxlength="350"
+                formControlName="valorTexto"
+                placeholder="Contanos algo sobre vos..."
+                [class.input-error]="editForm.get('valorTexto')?.invalid && editForm.get('valorTexto')?.touched">
+              </textarea>
+              <span class="field-hint">
+                {{ editForm.get('valorTexto')?.value?.length || 0 }}/350 caracteres
+              </span>
+              @if (editForm.get('valorTexto')?.touched && editForm.get('valorTexto')?.hasError('required')) {
+                <span class="field-error">La descripción es obligatoria.</span>
+              }
+            </div>
+          }
+
+          <!-- Fecha de nacimiento (idéntico al Registro) -->
+          @if (campo === 'fechaNacimiento') {
+            <div class="form-group">
+              <label id="birthDateEditLabel">Fecha de nacimiento</label>
+              <div class="birthdate-grid" role="group" aria-labelledby="birthDateEditLabel">
+                <div class="select-wrapper">
+                  <select
+                    aria-label="Día de nacimiento"
+                    [value]="selectedDay()"
+                    (change)="onDatePartChange('day', $event)"
+                    (blur)="markBirthDateTouched()"
+                    [class.input-error]="editForm.get('birthDate')?.invalid && editForm.get('birthDate')?.touched">
+                    <option value="" disabled>Día</option>
+                    @for (d of availableDays(); track d) {
+                      <option [value]="d">{{ d }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="select-wrapper">
+                  <select
+                    aria-label="Mes de nacimiento"
+                    [value]="selectedMonth()"
+                    (change)="onDatePartChange('month', $event)"
+                    (blur)="markBirthDateTouched()"
+                    [class.input-error]="editForm.get('birthDate')?.invalid && editForm.get('birthDate')?.touched">
+                    <option value="" disabled>Mes</option>
+                    @for (m of months; track m.value) {
+                      <option [value]="m.value">{{ m.label }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="select-wrapper">
+                  <select
+                    aria-label="Año de nacimiento"
+                    [value]="selectedYear()"
+                    (change)="onDatePartChange('year', $event)"
+                    (blur)="markBirthDateTouched()"
+                    [class.input-error]="editForm.get('birthDate')?.invalid && editForm.get('birthDate')?.touched">
+                    <option value="" disabled>Año</option>
+                    @for (y of years; track y) {
+                      <option [value]="y">{{ y }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+
+              @if (editForm.get('birthDate')?.touched && editForm.get('birthDate')?.hasError('required')) {
+                <span class="field-error">Seleccioná el día, mes y año de tu nacimiento.</span>
+              }
+              @if (editForm.get('birthDate')?.touched && editForm.get('birthDate')?.hasError('futureDate')) {
+                <span class="field-error">La fecha no puede ser posterior al día de hoy.</span>
+              }
+            </div>
+          }
+
+          <!-- Imagen de perfil (idéntico al Registro) -->
+          @if (campo === 'imagen') {
+            <div class="form-group">
+              <label for="profileImageEdit">Nueva imagen de perfil</label>
+              <label
+                for="profileImageEdit"
+                class="file-upload-box"
+                [class.input-error]="editForm.get('profileImage')?.invalid && editForm.get('profileImage')?.touched">
+                <input
+                  id="profileImageEdit"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  (change)="onImageSelected($event)"
+                />
+
+                @if (imagePreview()) {
+                  <div class="image-preview-container">
+                    <img [src]="imagePreview()" alt="Vista previa de perfil" />
+                    <span class="change-image-text">Hacé clic para cambiar la imagen</span>
+                  </div>
+                } @else {
+                  <div class="upload-placeholder">
+                    <span>Seleccionar archivo</span>
+                  </div>
+                }
+              </label>
+
+              <span class="field-hint">Formatos PNG, JPG, WEBP o GIF. Máximo 5 MB.</span>
+
+              @if (editForm.get('profileImage')?.touched && editForm.get('profileImage')?.hasError('required')) {
+                <span class="field-error">Seleccioná una nueva imagen para continuar.</span>
+              }
+              @if (editForm.get('profileImage')?.hasError('imageType')) {
+                <span class="field-error">El archivo debe ser una imagen válida.</span>
+              }
+              @if (editForm.get('profileImage')?.hasError('imageSize')) {
+                <span class="field-error">La imagen no puede superar los 5 MB.</span>
+              }
+            </div>
+          }
+
+          <!-- Contraseña (ingresar 2 veces la nueva contraseña) -->
+          @if (campo === 'password') {
+            <div class="form-group">
+              <label for="newPassword">Nueva contraseña</label>
+              <input
+                id="newPassword"
+                type="password"
+                formControlName="password"
+                placeholder="Nueva contraseña"
+                autocomplete="new-password"
+                [class.input-error]="editForm.get('password')?.invalid && editForm.get('password')?.touched"
+              />
+              @if (editForm.get('password')?.touched && editForm.get('password')?.hasError('required')) {
+                <span class="field-error">La contraseña es obligatoria.</span>
+              }
+              @if (editForm.get('password')?.touched && editForm.get('password')?.hasError('pattern')) {
+                <span class="field-error">Mínimo 8 caracteres, una mayúscula y un número.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="repeatNewPassword">Repetir nueva contraseña</label>
+              <input
+                id="repeatNewPassword"
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="Repetí la nueva contraseña"
+                autocomplete="new-password"
+                [class.input-error]="(editForm.get('confirmPassword')?.invalid || editForm.hasError('passwordMismatch')) && editForm.get('confirmPassword')?.touched"
+              />
+              @if (editForm.get('confirmPassword')?.touched && editForm.get('confirmPassword')?.hasError('required')) {
+                <span class="field-error">Repetir la contraseña es obligatorio.</span>
+              }
+              @if (editForm.get('confirmPassword')?.touched && editForm.hasError('passwordMismatch')) {
+                <span class="field-error">Las contraseñas no coinciden.</span>
+              }
+            </div>
+          }
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModalEditar()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary">
+              Aceptar
+            </button>
+          </div>
+        </form>
+      } @else {
+        <!-- PASO 2: CONFIRMAR CAMBIOS -->
+        <div class="confirm-step">
+          <p class="confirm-question">
+            ¿Estás seguro de que querés confirmar este cambio en tu perfil?
+          </p>
+
+          @if (campo === 'imagen' && imagePreview()) {
+            <div class="confirm-preview-avatar">
+              <img [src]="imagePreview()" alt="Nueva foto" />
+            </div>
+          } @else if (campo === 'fechaNacimiento') {
+            <div class="confirm-value-box">
+              {{ selectedDay() }}/{{ selectedMonth() }}/{{ selectedYear() }}
+            </div>
+          } @else if (campo !== 'password') {
+            <div class="confirm-value-box">
+              {{ editForm.get('valorTexto')?.value }}
+            </div>
+          }
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn-secondary"
+              [disabled]="guardandoCambio()"
+              (click)="volverAFormulario()">
+              Volver
+            </button>
+            <button
+              type="button"
+              class="btn-primary"
+              [disabled]="guardandoCambio()"
+              (click)="confirmarYGuardar()">
+              {{ guardandoCambio() ? 'Guardando...' : 'Confirmar cambio' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

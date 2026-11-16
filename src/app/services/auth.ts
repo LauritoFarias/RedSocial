@@ -19,9 +19,12 @@ export interface UsuarioSesion {
   apellido: string;
   correo: string;
   username: string;
-  imagenUrl: string;
+  imagenUrl?: string;
+  fotoPerfil?: string;
   descripcion: string;
+  fechaNacimiento?: string;
   perfil: string;
+  createdAt?: string;
 }
 
 export interface LoginResponse {
@@ -201,5 +204,25 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  actualizarPerfil(formData: FormData): Observable<{ usuario: UsuarioSesion }> {
+    const token = this.getToken();
+    const headers = token
+      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      : new HttpHeaders();
+
+    return this.http
+      .patch<{ usuario: UsuarioSesion }>(`${this.apiUrl}/perfil`, formData, { headers })
+      .pipe(
+        tap((res) => {
+          if (res.usuario) {
+            this.currentUser.set(res.usuario);
+            if (this.isBrowser) {
+              localStorage.setItem('usuario', JSON.stringify(res.usuario));
+            }
+          }
+        }),
+      );
   }
 }

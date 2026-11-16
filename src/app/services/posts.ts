@@ -35,6 +35,19 @@ export class PostsService {
     });
   }
 
+  getPostsByUser(userId: string, limit = 3): Observable<PaginatedPosts> {
+    const params = new HttpParams()
+      .set('sortBy', 'fecha')
+      .set('page', '1')
+      .set('limit', limit.toString())
+      .set('userId', userId);
+
+    return this.http.get<PaginatedPosts>(this.apiUrl, {
+      params,
+      headers: this.getHeaders(),
+    });
+  }
+
   createPost(formData: FormData): Observable<PostItem> {
     return this.http.post<PostItem>(this.apiUrl, formData, {
       headers: this.getHeaders(),
