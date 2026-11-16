@@ -13,24 +13,24 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
 
-  // Identidad Retro Vibes
+  // Identidad Retro Vibes (Cambiamos el violeta por gris oscuro / industrial)
   --brand-primary: #e11d48;
   --brand-primary-hover: #be123c;
   --brand-primary-soft: rgba(225, 29, 72, 0.1);
 
-  --brand-secondary: #4f46e5;
-  --brand-secondary-hover: #4338ca;
-  --brand-secondary-soft: rgba(79, 70, 229, 0.08);
+  --brand-secondary: #334155;          // Gris oscuro elegante en lugar de violeta
+  --brand-secondary-hover: #1e293b;    // Gris oscuro más profundo para hover
+  --brand-secondary-soft: rgba(51, 65, 85, 0.08);
 
   --brand-cyan: #0891b2;
 
-  // Configuración centralizada del Spinner (Azul-Violeta)
+  // Configuración centralizada del Spinner (Gris oscuro / Neutro)
   --spinner-size: 72px;
   --spinner-border: 6px;
-  --spinner-track: rgba(99, 102, 241, 0.16);
-  --spinner-color-primary: #4f46e5;
-  --spinner-color-secondary: #3b82f6;
-  --spinner-glow: rgba(79, 70, 229, 0.18);
+  --spinner-track: rgba(51, 65, 85, 0.16);
+  --spinner-color-primary: #334155;
+  --spinner-color-secondary: #64748b;
+  --spinner-glow: none; // Sin resplandores IA
 
   // Estados semánticos
   --color-error: #dc2626;
@@ -42,18 +42,18 @@
   --color-success-border: #bbf7d0;
 
   // Bordes, Radios y Medidas de Layout
-  --border-color: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --border-color: #cbd5e1; // Bordes un poco más marcados, aspecto más impreso/antiguo
+  --border-strong: #94a3b8;
+  --radius-sm: 4px;        // Radios más rectos y limpios, menos "app moderna genérica"
+  --radius-md: 6px;
+  --radius-lg: 10px;
   --radius-full: 9999px;
   --header-height: 64px;
 
-  // Sombras
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
-  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-  --shadow-float: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
+  // Sombras (Eliminadas globalmente salvo excepciones puntuales)
+  --shadow-sm: none;
+  --shadow-card: none;
+  --shadow-float: none;
 }
 
 /* ==========================================================================
@@ -72,8 +72,14 @@ body {
   min-height: 100vh;
   background-color: var(--bg-page);
   color: var(--text-main);
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  // Tipografía estilo editorial / clásico para huir de la estética genérica de IA
+  font-family: 'Times New Roman', Times, Georgia, serif; 
   -webkit-font-smoothing: antialiased;
+}
+
+// Fuentes de texto limpias para formularios y elementos de interfaz de lectura cómoda
+input, textarea, select, button, .btn-primary, .btn-secondary, .btn-action, .tabs-nav {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
 }
 
 /* ==========================================================================
@@ -109,8 +115,8 @@ body {
   border: var(--spinner-border) solid var(--spinner-track);
   border-top-color: var(--spinner-color-primary);
   border-right-color: var(--spinner-color-secondary);
-  box-shadow: 0 0 18px var(--spinner-glow);
-  animation: globalSpin 0.8s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+  box-shadow: none; // Sin resplandor artificial
+  animation: globalSpin 0.9s steps(8) infinite; // Giro estilo fotograma retro en lugar de fluido IA
 
   &.sm {
     width: 44px;
@@ -145,6 +151,7 @@ body {
     font-weight: 600;
     color: var(--text-main);
     margin-bottom: 0.45rem;
+    font-family: 'Segoe UI', system-ui, sans-serif;
   }
 
   input:not([type='file']),
@@ -159,28 +166,24 @@ body {
     font-family: inherit;
     font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: none !important; // Eliminamos sombras en foco típicas de IA
+    transition: border-color 0.15s ease, background-color 0.15s ease;
 
     &::placeholder {
       color: var(--text-muted);
     }
 
     &:hover:not(:focus):not(.input-error) {
-      border-color: #94a3b8;
+      border-color: #64748b;
     }
 
     &:focus {
       border-color: var(--brand-secondary);
-      box-shadow: 0 0 0 3px var(--brand-secondary-soft);
     }
 
     &.input-error {
       border-color: var(--color-error);
       background-color: #fffafa;
-
-      &:focus {
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
-      }
     }
   }
 
@@ -210,7 +213,7 @@ body {
   }
 }
 
-// Caja global reutilizable para subida de imágenes (Registro, Feed, Perfil)
+// Caja global reutilizable para subida de imágenes
 .file-upload-box {
   display: flex;
   flex-direction: column;
@@ -254,25 +257,23 @@ body {
   }
 }
 
-// Agregar dentro de .file-upload-box en src/styles.scss:
-  .image-preview-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.55rem;
-    width: 100%;
+.image-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
 
-    img {
-      width: 96px;
-      height: 96px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 2px solid var(--brand-secondary);
-      box-shadow: var(--shadow-sm);
-    }
+  img {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--brand-secondary);
+    box-shadow: none;
   }
+}
 
-// Agregar debajo de .file-upload-box en src/styles.scss:
 .birthdate-grid {
   display: grid;
   grid-template-columns: 1fr 1.45fr 1.1fr;
@@ -332,18 +333,17 @@ body {
   border-radius: var(--radius-md);
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: none !important; // Sin sombras en botones
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-primary {
   background-color: var(--brand-primary);
   color: #ffffff;
   border: none;
-  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.25);
 
   &:hover:not(:disabled) {
     background-color: var(--brand-primary-hover);
-    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
   }
 
   &:active:not(:disabled) {
@@ -353,7 +353,6 @@ body {
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    box-shadow: none;
   }
 }
 
@@ -380,7 +379,7 @@ body {
   border-radius: var(--radius-full);
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease;
 
   &:hover {
     background-color: var(--bg-subtle);
@@ -405,7 +404,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border-color);
   height: var(--header-height);
@@ -433,11 +432,11 @@ body {
     letter-spacing: -0.02em;
 
     .brand-dot {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-      box-shadow: 0 0 0 3px var(--brand-primary-soft);
+      background: var(--brand-primary);
+      box-shadow: none;
     }
   }
 
@@ -456,7 +455,7 @@ body {
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.15s ease;
 
     &:hover {
       background-color: var(--brand-secondary);
@@ -480,11 +479,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: none;
+    transition: transform 0.15s ease;
 
     &:hover {
-      transform: scale(1.04);
-      box-shadow: 0 0 0 3px var(--brand-secondary-soft);
+      transform: scale(1.02);
     }
 
     img {
@@ -502,10 +501,9 @@ body {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-float);
+    box-shadow: none; // Sin sombra flotante artificial
     padding: 0.5rem;
     z-index: 200;
-    animation: fadeInDropdown 0.15s ease-out;
 
     .dropdown-user-info {
       padding: 0.5rem 0.75rem;
@@ -574,9 +572,9 @@ body {
     color: var(--text-secondary);
     background: transparent;
     border: none;
-    border-bottom: 2.5px solid transparent;
+    border-bottom: 2px solid transparent;
     cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color 0.15s, border-color 0.15s;
 
     &:hover {
       color: var(--text-main);
@@ -613,7 +611,8 @@ body {
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
-    transition: all 0.15s ease;
+    box-shadow: none;
+    transition: background-color 0.15s ease;
 
     &:hover:not(:disabled):not(.active) {
       background-color: var(--bg-subtle);
@@ -642,13 +641,12 @@ body {
   inset: 0;
   z-index: 1000;
   background-color: var(--bg-overlay);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
   overflow-y: auto;
-  animation: fadeInBackdrop 0.2s ease-out;
 }
 
 .session-modal-backdrop {
@@ -661,8 +659,7 @@ body {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-float);
-  animation: scaleInModal 0.2s ease-out;
+  box-shadow: none; // Sin sombras flotantes modernas
 }
 
 .modal-card {
@@ -698,7 +695,6 @@ body {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.15s ease, color 0.15s ease;
 
       &:hover {
         background-color: var(--border-color);
@@ -792,12 +788,11 @@ body {
   background-color: var(--bg-surface);
   color: var(--text-main);
   border: 1.5px solid var(--color-success);
-  box-shadow: var(--shadow-float);
+  box-shadow: none;
   padding: 0.85rem 1.35rem;
   border-radius: var(--radius-md);
   font-size: 0.92rem;
   font-weight: 600;
-  animation: toastSlideDown 0.25s ease-out;
 
   .toast-icon {
     display: inline-flex;
@@ -876,6 +871,7 @@ body {
     letter-spacing: -0.02em;
     color: var(--text-main);
     margin: 0;
+    font-family: 'Times New Roman', Times, Georgia, serif;
 
     span {
       display: block;
@@ -885,6 +881,7 @@ body {
       font-weight: 400;
       letter-spacing: normal;
       color: var(--text-secondary);
+      font-family: 'Segoe UI', system-ui, sans-serif;
     }
   }
 }
@@ -905,7 +902,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 2.25rem 2rem;
-    box-shadow: var(--shadow-card);
+    box-shadow: none; // Sin sombreado artificial en tarjetas de formulario
   }
 
   .form-header {
@@ -917,6 +914,7 @@ body {
       letter-spacing: -0.01em;
       color: var(--text-main);
       margin: 0 0 0.4rem 0;
+      font-family: 'Times New Roman', Times, Georgia, serif;
     }
 
     p {
@@ -972,24 +970,4 @@ body {
 
 @keyframes globalSpin {
   to { transform: rotate(360deg); }
-}
-
-@keyframes toastSlideDown {
-  from { opacity: 0; transform: translate(-50%, -15px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-@keyframes fadeInDropdown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInBackdrop {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleInModal {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
 }

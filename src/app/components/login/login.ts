@@ -15,10 +15,9 @@ export class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Definí acá los parámetros de tu usuario válido de prueba
   private readonly DEMO_USER = {
-    identificador: 'retro_admin',
-    password: 'Password123'
+    identificador: 'ivanlaurito@hotmail.com',
+    password: 'Contraseñasegura.123'
   };
 
   loginForm = this.fb.group({
@@ -56,7 +55,7 @@ export class Login {
       .subscribe({
         next: () => {
           this.isSubmitting.set(false);
-          this.router.navigate(['/feed']); // Unificado con la ruta '/feed' de app.routes.ts
+          this.router.navigate(['/feed']);
         },
         error: (err: HttpErrorResponse) => {
           this.isSubmitting.set(false);

@@ -20,10 +20,8 @@ export class Feed implements OnInit {
   private fb = inject(FormBuilder);
   private platformId = inject(PLATFORM_ID);
 
-  // Controla la carga inicial completa de la pantalla (bloquea el render hasta que todo esté listo)
   paginaLista = signal<boolean>(false);
 
-  // Estado del listado y paginación (10 en 10)
   posts = signal<PostItem[]>([]);
   sortBy = signal<'fecha' | 'likes'>('fecha');
   currentPage = signal<number>(1);
@@ -31,13 +29,11 @@ export class Feed implements OnInit {
   totalPages = signal<number>(1);
   cargando = signal<boolean>(false);
 
-  // Estado del usuario y menú del header
   usuarioActual = computed(() => this.authService.currentUser());
   currentUserId = computed(() => this.authService.currentUserId());
   esAdmin = computed(() => this.authService.currentUser()?.perfil === 'admin');
   menuUsuarioAbierto = signal<boolean>(false);
 
-  // URL segura del avatar del usuario logueado (sin apuntar a archivos inexistentes)
   avatarUsuarioActual = computed(() => {
     const user = this.usuarioActual();
     if (user?.imagenUrl) return user.imagenUrl;
@@ -45,7 +41,6 @@ export class Feed implements OnInit {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=4f46e5&color=fff`;
   });
 
-  // Estado del Modal para crear publicación
   modalCrearAbierto = signal<boolean>(false);
   creandoPost = signal<boolean>(false);
   errorCreacion = signal<string>('');
@@ -97,7 +92,7 @@ export class Feed implements OnInit {
         new Promise<void>((resolve) => {
           const img = new Image();
           img.onload = () => resolve();
-          img.onerror = () => resolve(); // Si alguna falla, no bloquea la pantalla
+          img.onerror = () => resolve();
           img.src = url;
         }),
     );

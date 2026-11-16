@@ -21,7 +21,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth';
 import { take } from 'rxjs';
 
-// Estructura y estado en memoria para conservar los inputs al navegar sin sobrevivir a F5
+
 interface RegistroDraft {
   nombre: string;
   apellido: string;
@@ -222,7 +222,7 @@ export class Registro implements OnInit, OnDestroy {
   today = this.getTodayString();
 
   constructor() {
-    // Guarda automáticamente en memoria cada cambio que hace el usuario
+    
     this.registroForm.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
@@ -231,7 +231,7 @@ export class Registro implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Si había datos en memoria al volver desde /login, los restauramos
+    
     if (registroDraftCache) {
       this.selectedDay.set(registroDraftCache.selectedDay);
       this.selectedMonth.set(registroDraftCache.selectedMonth);
@@ -391,7 +391,7 @@ export class Registro implements OnInit, OnDestroy {
     this.authService.registrar(formData).pipe(take(1)).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        registroDraftCache = null; // Limpiamos la memoria tras un registro exitoso
+        registroDraftCache = null; 
         this.successMessage.set('¡Usuario registrado correctamente! Redirigiendo...');
 
         setTimeout(() => {
@@ -408,7 +408,7 @@ export class Registro implements OnInit, OnDestroy {
         } else {
           this.errorMessage.set('Ocurrió un error al registrar el usuario. Intentá nuevamente.');
         }
-        // Sube automáticamente hasta el cartel de error general (.alert-error)
+        
         this.scrollToError('.alert-error');
       }
     });

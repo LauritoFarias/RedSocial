@@ -1,5 +1,180 @@
-.form-panel {
-  .form-card {
-    max-width: 500px;
+/* =========================================================
+   LOGIN - PANEL DE IDENTIDAD
+   ========================================================= */
+
+.brand-panel {
+  position: relative;
+  align-items: stretch;
+  justify-content: center;
+  padding: 6rem 3.5rem 3rem;
+
+  // Logo independiente del contenido principal
+  .brand-logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 3rem;
+    width: clamp(100px, 11vw, 150px);
+    z-index: 2;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 90px;
+      object-fit: contain;
+    }
+  }
+
+  // Contenido principal
+  .brand-content {
+    width: 100%;
+    max-width: 720px;
+    margin: auto;
+    gap: 2.5rem;
+    justify-content: center;
+  }
+
+  // Galería de tres imágenes
+  .brand-gallery {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    height: 420px;
+    margin: 0 auto;
+  }
+
+  .gallery-image {
+    position: absolute;
+    display: block;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    
+    // EXCEPCIÓN SOLICITADA: Únicamente estas tres fotos conservan sombreado (drop-shadow)
+    filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.15));
+
+    -webkit-mask-image: radial-gradient(
+      ellipse at center,
+      #000 75%,
+      rgba(0, 0, 0, 0.85) 88%,
+      transparent 100%
+    );
+
+    mask-image: radial-gradient(
+      ellipse at center,
+      #000 75%,
+      rgba(0, 0, 0, 0.85) 88%,
+      transparent 100%
+    );
+
+    &:hover {
+      transform: scale(1.03);
+      z-index: 5;
+    }
+  }
+
+  // Imagen vertical protagonista
+  .image-one {
+    width: 240px;
+    height: 360px;
+    left: 0;
+    top: 20px;
+    z-index: 1;
+    max-height: 190px;
+  }
+
+  // Imagen horizontal
+  .image-two {
+    width: 340px;
+    height: 210px;
+    right: 0;
+    top: 5px;
+    z-index: 2;
+    max-height: 250px;
+  }
+
+  // Imagen intermedia
+  .image-three {
+    width: 290px;
+    height: 240px;
+    right: 35px;
+    bottom: 0;
+    z-index: 3;
+    max-height: 210px;
+  }
+
+  .brand-description {
+    width: 100%;
+  }
+
+  .brand-tagline {
+    font-size: clamp(2rem, 3vw, 2.8rem);
+  }
+}
+
+/* =========================================================
+   LOGIN - SEPARACIÓN DE BOTONES
+   ========================================================= */
+
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+
+  button {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 960px) {
+  .brand-panel {
+    padding: 6rem 1.5rem 2rem;
+
+    .brand-logo {
+      top: 1.5rem;
+      left: 1.5rem;
+      width: 105px;
+    }
+
+    .brand-content {
+      gap: 1.25rem;
+    }
+
+    .brand-gallery {
+      min-height: 150px;
+    }
+
+    .gallery-image {
+      height: 140px;
+    }
+
+    .image-one {
+      max-height: 115px;
+    }
+
+    .image-two {
+      max-height: 150px;
+    }
+
+    .image-three {
+      max-height: 125px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-panel {
+    .brand-gallery {
+      min-height: 115px;
+    }
+
+    .gallery-image {
+      height: 110px;
+    }
   }
 }

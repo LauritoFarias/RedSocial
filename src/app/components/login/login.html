@@ -1,19 +1,42 @@
+
 <div class="login-wrapper">
   <section class="brand-panel">
+
+    <div class="brand-logo">
+      <img src="assets/images/logo.png" alt="Retro Vibes" />
+    </div>
+
     <div class="brand-content">
-      <div class="brand-image">
-        <img src="assets/images/logo.png" alt="Retro Vibes" />
+
+      <div class="brand-gallery">
+        <img
+          src="assets/images/postcard-1.jpg"
+          alt="Imagen retro 1"
+          class="gallery-image image-one"
+        />
+
+        <img
+          src="assets/images/postcard-2.jpg"
+          alt="Imagen retro 2"
+          class="gallery-image image-two"
+        />
+
+        <img
+          src="assets/images/postcard-3.jpg"
+          alt="Imagen retro 3"
+          class="gallery-image image-three"
+        />
       </div>
 
       <div class="brand-description">
         <p class="brand-tagline">
-          Reviví la era dorada
+          Reviví las viejas épocas
           <span>
-            de los 8 y 16 bits, chips de silicio,
-            reliquias mecánicas y la cultura hacker.
+            de los 8 y 16 bits, los chips de silicio y las reliquias mecánicas.
           </span>
         </p>
       </div>
+
     </div>
   </section>
 
@@ -21,7 +44,7 @@
     <div class="form-card">
       <header class="form-header">
         <h2>Iniciar sesión</h2>
-        <p>Ingresá tus credenciales para entrar a Retro Vibes.</p>
+        <p>Ingresá tus credenciales para entrar a Portal Retro.</p>
       </header>
 
       @if (errorMessage()) {
@@ -37,7 +60,7 @@
             id="identificador"
             type="text"
             formControlName="identificador"
-            placeholder="ejemplo@correo.com o tu_usuario"
+            placeholder="Correo o nombre de usuario"
             autocomplete="username"
             [class.input-error]="loginForm.get('identificador')?.invalid && loginForm.get('identificador')?.touched"
           />
@@ -53,7 +76,7 @@
             id="password"
             type="password"
             formControlName="password"
-            placeholder="Tu contraseña"
+            placeholder="Contraseña"
             autocomplete="current-password"
             [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
           />
@@ -63,22 +86,24 @@
           }
         </div>
 
-        <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
-          @if (isSubmitting()) {
-            <span>Ingresando...</span>
-          } @else {
-            <span>Iniciar sesión</span>
-          }
-        </button>
+        <div class="login-actions">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="isSubmitting()"
+          >
+            Iniciar sesión
+          </button>
 
-        <button
-          type="button"
-          class="btn-secondary"
-          (click)="quickLogin()"
-          [disabled]="isSubmitting()"
-        >
-          ⚡ Acceso rápido (Usuario Demo)
-        </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="quickLogin()"
+            [disabled]="isSubmitting()"
+          >
+            Acceso rápido (Usuario Demo)
+          </button>
+        </div>
       </form>
 
       <footer class="form-footer">
