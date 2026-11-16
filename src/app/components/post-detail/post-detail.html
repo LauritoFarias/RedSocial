@@ -1,0 +1,77 @@
+@if (!paginaLista()) {
+  <div class="feed-initial-loader" role="status" aria-label="Cargando publicación">
+    <div class="retro-spinner"></div>
+  </div>
+} @else {
+  <!-- HEADER STICKY GLOBAL -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a routerLink="/feed" class="brand-link">
+        <span class="brand-dot"></span>
+        <span class="brand-title">Retro Vibes</span>
+      </a>
+
+      <div class="header-actions">
+        <div class="user-menu-wrapper">
+          <button
+            type="button"
+            class="avatar-trigger"
+            (click)="toggleMenuUsuario($event)"
+            aria-label="Menú de usuario">
+            <img
+              [src]="avatarUsuarioActual()"
+              [alt]="usuarioActual()?.username || 'Usuario'"
+            />
+          </button>
+
+          @if (menuUsuarioAbierto()) {
+            <div class="user-dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-user-info">
+                <strong>{{ usuarioActual()?.nombre }}</strong>
+                <span>&#64;{{ usuarioActual()?.username }}</span>
+              </div>
+              <hr />
+              <a routerLink="/perfil" class="dropdown-item" (click)="cerrarMenuUsuario()">
+                Ver perfil
+              </a>
+              <button type="button" class="dropdown-item dropdown-logout" (click)="cerrarSesion()">
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO DE DETALLE -->
+  <main class="post-detail-page" (click)="cerrarMenuUsuario()">
+    <section class="post-detail-container post-detail-view">
+      <!-- Barra de navegación para volver al Feed -->
+      <nav class="detail-back-bar">
+        <a routerLink="/feed" class="btn-back">
+          <span>←</span>
+          <span>Volver al feed</span>
+        </a>
+      </nav>
+
+      @if (errorNoEncontrado() || !post()) {
+        <div class="detail-error-card">
+          <h2>Publicación no disponible</h2>
+          <p>La publicación que buscás no existe o fue eliminada.</p>
+          <a routerLink="/feed" class="btn-primary">Ir al Feed</a>
+        </div>
+      } @else {
+        <app-post-card
+          [post]="post()!"
+          [currentUserId]="currentUserId()"
+          [esAdmin]="esAdmin()"
+          [modoDetalle]="true"
+          [abrirComentariosInicialmente]="true"
+          (likeToggled)="manejarLike($event)"
+          (deleted)="manejarEliminacion($event)"
+        />
+      }
+    </section>
+  </main>
+}

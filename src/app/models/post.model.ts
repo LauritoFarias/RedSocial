@@ -4,6 +4,28 @@ export interface Autor {
   nombre?: string;
   apellido?: string;
   imagenUrl?: string;
+  fotoPerfil?: string;
+}
+
+export interface CommentItem {
+  _id: string;
+  postId: string;
+  autor: Autor;
+  texto: string;
+  editado: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PaginatedComments {
+  data: CommentItem[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
 }
 
 export interface PostItem {
@@ -14,6 +36,7 @@ export interface PostItem {
   autor: Autor;
   likes: string[];
   likesCount: number;
+  commentsCount?: number;
   createdAt: string;
 }
 

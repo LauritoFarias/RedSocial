@@ -1,0 +1,174 @@
+// ==========================================================================
+// 1. LAYOUT DE PÁGINA DEL FEED
+// ==========================================================================
+.feed-page {
+  min-height: calc(100vh - var(--header-height));
+  padding: 2rem 1rem 4rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.feed-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ==========================================================================
+// 2. WIDGET RÁPIDO "CREAR PUBLICACIÓN" Y BARRA DE ORDENAMIENTO
+// ==========================================================================
+.create-post-prompt {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+
+  .prompt-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+  }
+
+  .prompt-fake-input {
+    flex: 1;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: 0.7rem 1.1rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #e2e8f0;
+    }
+  }
+
+  .prompt-btn {
+    width: auto;
+    padding: 0.65rem 1.15rem;
+    flex-shrink: 0;
+
+    @media (max-width: 540px) {
+      display: none;
+    }
+  }
+}
+
+.feed-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem 1.25rem 0;
+  box-shadow: var(--shadow-sm);
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    color: var(--text-main);
+  }
+
+  .tabs-nav {
+    border-bottom: none;
+  }
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.feed-status-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  color: var(--text-secondary);
+
+  h3 {
+    color: var(--text-main);
+    margin: 0 0 0.4rem;
+  }
+
+  .btn-primary {
+    margin-top: 1rem;
+    max-width: 260px;
+  }
+}
+
+// ==========================================================================
+// 3. PREVIEW DE IMAGEN HORIZONTAL ESPECÍFICA DEL MODAL DE NUEVO POST
+// ==========================================================================
+.post-image-upload {
+  .post-image-preview {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+
+    img {
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      border-radius: var(--radius-md);
+      background-color: #0f172a;
+    }
+
+    .preview-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .btn-remove-img {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+      border: 1px solid var(--color-error-border);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,1 +1,193 @@
-<img [src]="post().autor.imagenUrl || 'assets/default-avatar.png'" [alt]="post().autor.username" class="avatar" />
+<article class="post-card" [class.is-detail]="modoDetalle()">
+  <!-- CABECERA DEL POST -->
+  <header class="post-header">
+    <div class="autor-info">
+      <img
+        [src]="post().autor.imagenUrl || post().autor.fotoPerfil || 'https://ui-avatars.com/api/?name=' + post().autor.username + '&background=4f46e5&color=fff'"
+        [alt]="post().autor.username"
+        class="avatar"
+      />
+      <div class="autor-meta">
+        <div class="autor-names">
+          @if (post().autor.nombre) {
+            <span class="nombre">{{ post().autor.nombre }} {{ post().autor.apellido }}</span>
+          }
+          <span class="username">&#64;{{ post().autor.username }}</span>
+        </div>
+
+        <!-- Fecha como enlace subrayable estilo Facebook -->
+        <a
+          [routerLink]="['/post', post()._id]"
+          class="fecha-link"
+          title="Ver publicación completa">
+          <time [attr.datetime]="post().createdAt">
+            {{ post().createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </time>
+        </a>
+      </div>
+    </div>
+
+    <div class="header-right-actions">
+      @if (puedeEliminar()) {
+        <button
+          type="button"
+          class="btn-delete"
+          (click)="onDelete()"
+          title="Eliminar publicación">
+          Eliminar
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- CUERPO DEL POST (Soporta con o sin imagen) -->
+  <div class="post-body">
+    <h3 class="post-title">{{ post().titulo }}</h3>
+    <p class="post-desc">{{ post().descripcion }}</p>
+
+    @if (post().imagenUrl) {
+      <div class="post-image-container">
+        <img
+          [src]="post().imagenUrl"
+          [alt]="post().titulo"
+          class="post-image"
+          loading="lazy"
+        />
+      </div>
+    }
+  </div>
+
+  <!-- PIE DEL POST (ACCIONES: solo Me gusta y Comentarios) -->
+  <footer class="post-footer">
+    <div class="footer-left">
+      <button
+        type="button"
+        class="btn-action"
+        [class.is-liked]="dioLike()"
+        (click)="onToggleLike()">
+        <span class="icon">{{ dioLike() ? '❤️' : '🤍' }}</span>
+        <span>{{ post().likesCount }} Me gusta</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn-action"
+        [class.is-active]="comentariosAbiertos()"
+        (click)="toggleCajaComentarios()">
+        <span class="icon">💬</span>
+        <span>
+          {{ comentariosAbiertos() ? 'Ocultar comentarios' : 'Comentarios' }}
+          @if (totalComentarios() > 0) {
+            ({{ totalComentarios() }})
+          }
+        </span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- CAJA DESPLEGABLE DE COMENTARIOS (Carga de 10 en 10) -->
+  @if (comentariosAbiertos()) {
+    <section class="comments-section">
+      <!-- Formulario para escribir un nuevo comentario -->
+      <div class="comment-composer">
+        <textarea
+          rows="2"
+          [ngModel]="nuevoComentarioTexto()"
+          (ngModelChange)="nuevoComentarioTexto.set($event)"
+          placeholder="Escribí un comentario..."
+          maxlength="1000">
+        </textarea>
+        <button
+          type="button"
+          class="btn-primary btn-send-comment"
+          [disabled]="!nuevoComentarioTexto().trim() || enviandoComentario()"
+          (click)="enviarComentario()">
+          {{ enviandoComentario() ? 'Enviando...' : 'Comentar' }}
+        </button>
+      </div>
+
+      <!-- Lista ordenada de comentarios -->
+      <div class="comments-list">
+        @for (comentario of comentarios(); track comentario._id) {
+          <div class="comment-item">
+            <img
+              [src]="comentario.autor.imagenUrl || comentario.autor.fotoPerfil || 'https://ui-avatars.com/api/?name=' + comentario.autor.username + '&background=4f46e5&color=fff'"
+              [alt]="comentario.autor.username"
+              class="comment-avatar"
+            />
+            <div class="comment-content">
+              <div class="comment-header">
+                <div class="comment-author-meta">
+                  <span class="comment-username">&#64;{{ comentario.autor.username }}</span>
+                  <time class="comment-date">
+                    {{ comentario.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                  </time>
+                  @if (comentario.editado) {
+                    <span class="edited-badge" title="Este comentario fue modificado">
+                      • (editado)
+                    </span>
+                  }
+                </div>
+
+                @if (comentario.autor._id === currentUserId() && comentarioEditandoId() !== comentario._id) {
+                  <button
+                    type="button"
+                    class="btn-edit-comment"
+                    (click)="iniciarEdicion(comentario)">
+                    Editar
+                  </button>
+                }
+              </div>
+
+              @if (comentarioEditandoId() === comentario._id) {
+                <div class="comment-edit-box">
+                  <textarea
+                    rows="2"
+                    [ngModel]="textoEdicion()"
+                    (ngModelChange)="textoEdicion.set($event)"
+                    maxlength="1000">
+                  </textarea>
+                  <div class="edit-actions">
+                    <button
+                      type="button"
+                      class="btn-cancel-edit"
+                      (click)="cancelarEdicion()">
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-save-edit"
+                      [disabled]="!textoEdicion().trim() || guardandoEdicion()"
+                      (click)="guardarEdicion(comentario._id)">
+                      {{ guardandoEdicion() ? 'Guardando...' : 'Guardar cambios' }}
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <p class="comment-text">{{ comentario.texto }}</p>
+              }
+            </div>
+          </div>
+        } @empty {
+          @if (!cargandoComentarios()) {
+            <p class="no-comments">Aún no hay comentarios. ¡Sé el primero en opinar!</p>
+          }
+        }
+      </div>
+
+      @if (cargandoComentarios()) {
+        <div class="comments-loading">Cargando comentarios...</div>
+      }
+
+      <!-- Botón "Cargar más" que trae los siguientes 10 sin borrar los anteriores -->
+      @if (hayMasComentarios() && !cargandoComentarios()) {
+        <button
+          type="button"
+          class="btn-load-more"
+          (click)="cargarMasComentarios()">
+          Cargar más comentarios
+        </button>
+      }
+    </section>
+  }
+</article>

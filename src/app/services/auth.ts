@@ -5,6 +5,14 @@ import { Router } from '@angular/router';
 import { Observable, tap, map, catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+// =========================================================================
+// ⚙️ CONFIGURACIÓN DE TIEMPOS DE SESIÓN (Fáciles de cambiar en un solo lugar)
+// Para la prueba de 1m 30s: Aviso a los 60s y cuenta regresiva de 30s.
+// Si en el backend ponés 15m, podés cambiar TIEMPO_AVISO_MS a 14 * 60 * 1000.
+// =========================================================================
+export const TIEMPO_AVISO_MS = 60 * 1000; // 1 minuto para abrir el modal
+export const TIEMPO_GRACIA_SEGUNDOS = 30; // 30 segundos restantes antes de vencer
+
 export interface UsuarioSesion {
   _id: string;
   nombre: string;
@@ -30,7 +38,9 @@ export class AuthService {
   private platformId = inject(PLATFORM_ID);
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  // Verifica si estamos ejecutando en el navegador antes de leer localStorage
+  private warningTimeoutId: any = null;
+  private countdownIntervalId: any = null;
+
   private get isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
@@ -39,17 +49,52 @@ export class AuthService {
   currentUserId = computed(() => this.currentUser()?._id ?? '');
   isAuthenticated = computed(() => !!this.currentUser() && !!this.getToken());
 
+  // Signals para el modal de advertencia de sesión a nivel aplicación
+  mostrarModalExpiracion = signal<boolean>(false);
+  segundosRestantes = signal<number>(TIEMPO_GRACIA_SEGUNDOS);
+  refrescandoToken = signal<boolean>(false);
+
+  // Registro ahora también guarda el token en localStorage e inicia el contador
   registrar(formData: FormData): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/registro`, formData);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/registro`, formData).pipe(
+      tap((res) => this.guardarSesion(res)),
+    );
   }
 
+  // Login guarda el token en localStorage e inicia el contador
   login(credenciales: { identificador: string; password: string }): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credenciales).pipe(
       tap((res) => this.guardarSesion(res)),
     );
   }
 
+  // Refresca el token cuando el usuario acepta extender su sesión en el modal
+  extenderSesion(): void {
+    if (!this.isBrowser || this.refrescandoToken()) return;
+
+    const token = this.getToken();
+    if (!token) {
+      this.logout();
+      return;
+    }
+
+    this.refrescandoToken.set(true);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    this.http.post<LoginResponse>(`${this.apiUrl}/refresh`, {}, { headers }).subscribe({
+      next: (res) => {
+        this.refrescandoToken.set(false);
+        this.guardarSesion(res); // Guarda el nuevo token y reinicia el contador de 1 min
+      },
+      error: () => {
+        this.refrescandoToken.set(false);
+        this.logout();
+      },
+    });
+  }
+
   logout(): void {
+    this.detenerTemporizadores();
     this.limpiarSesion();
     this.router.navigate(['/login']);
   }
@@ -59,10 +104,6 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-  /**
-   * Valida el token con GET /auth/me y actualiza el usuario en memoria/localStorage.
-   * Ideal para usar dentro del AuthGuard.
-   */
   verificarSesion(): Observable<boolean> {
     if (!this.isBrowser) {
       return of(false);
@@ -83,6 +124,10 @@ export class AuthService {
           if (res.usuario) {
             this.currentUser.set(res.usuario);
             localStorage.setItem('usuario', JSON.stringify(res.usuario));
+            // Si aún no había un contador corriendo (ej: tras F5), lo iniciamos
+            if (!this.warningTimeoutId && !this.mostrarModalExpiracion()) {
+              this.iniciarTemporizadorSesion();
+            }
           }
         }),
         map((res) => res.valido),
@@ -93,12 +138,49 @@ export class AuthService {
       );
   }
 
+  // ================= LÓGICA DEL TEMPORIZADOR DE SESIÓN =================
+
+  iniciarTemporizadorSesion(): void {
+    if (!this.isBrowser) return;
+    this.detenerTemporizadores();
+
+    // 1. Al cumplirse 1 minuto (TIEMPO_AVISO_MS), abrimos el modal de 30 segundos
+    this.warningTimeoutId = setTimeout(() => {
+      this.segundosRestantes.set(TIEMPO_GRACIA_SEGUNDOS);
+      this.mostrarModalExpiracion.set(true);
+
+      // 2. Descontamos segundo a segundo los 30s restantes
+      this.countdownIntervalId = setInterval(() => {
+        const actual = this.segundosRestantes() - 1;
+        if (actual <= 0) {
+          // Si llegó a 0 y no extendió, cerramos sesión y redirigimos al login
+          this.logout();
+        } else {
+          this.segundosRestantes.set(actual);
+        }
+      }, 1000);
+    }, TIEMPO_AVISO_MS);
+  }
+
+  private detenerTemporizadores(): void {
+    if (this.warningTimeoutId) {
+      clearTimeout(this.warningTimeoutId);
+      this.warningTimeoutId = null;
+    }
+    if (this.countdownIntervalId) {
+      clearInterval(this.countdownIntervalId);
+      this.countdownIntervalId = null;
+    }
+    this.mostrarModalExpiracion.set(false);
+  }
+
   private guardarSesion(res: LoginResponse): void {
     if (this.isBrowser) {
       localStorage.setItem('token', res.access_token);
       localStorage.setItem('usuario', JSON.stringify(res.usuario));
     }
     this.currentUser.set(res.usuario);
+    this.iniciarTemporizadorSesion();
   }
 
   private limpiarSesion(): void {

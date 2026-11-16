@@ -12,6 +12,10 @@ export const authGuard: CanActivateFn = () => {
   if (!isPlatformBrowser(platformId)) {
     return true;
   }
+  
+  if (authService.isAuthenticated()) {
+    return true;
+  }
 
   return authService.verificarSesion().pipe(
     map((esValido) => (esValido ? true : router.createUrlTree(['/login']))),

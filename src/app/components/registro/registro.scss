@@ -108,7 +108,7 @@
 
 .birthdate-grid {
   display: grid;
-  grid-template-columns: 1fr 1.45fr 1.1fr; // Día | Mes (más ancho) | Año
+  grid-template-columns: 1fr 1.45fr 1.1fr;
   gap: 0.75rem;
 
   @media (max-width: 480px) {
@@ -121,7 +121,6 @@
   position: relative;
   width: 100%;
 
-  // Flecha minimalista personalizada
   &::after {
     content: '';
     position: absolute;
@@ -143,7 +142,7 @@
   select {
     appearance: none;
     -webkit-appearance: none;
-    padding-right: 2.25rem !important; // Espacio para la flecha
+    padding-right: 2.25rem !important;
     cursor: pointer;
     background-color: var(--bg-surface);
   }

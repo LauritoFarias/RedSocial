@@ -1,58 +1,225 @@
-<section class="feed-container">
-  <header class="feed-controls">
-    <h1>Publicaciones</h1>
+@if (!paginaLista()) {
+  <!-- SPINNER A PANTALLA COMPLETA MIENTRAS SE PRE-CARGA TODO EL FEED E IMÁGENES -->
+  <div class="feed-initial-loader" role="status" aria-label="Cargando">
+    <div class="retro-spinner"></div>
+  </div>
+} @else {
+  <!-- HEADER STICKY -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a routerLink="/feed" class="brand-link">
+        <span class="brand-dot"></span>
+        <span class="brand-title">Retro Vibes</span>
+      </a>
 
-    <div class="sort-selector">
-      <span>Ordenar por:</span>
-      <button 
-        type="button"
-        [class.active]="sortBy() === 'fecha'" 
-        (click)="cambiarOrden('fecha')">
-        Más recientes
-      </button>
-      <button 
-        type="button"
-        [class.active]="sortBy() === 'likes'" 
-        (click)="cambiarOrden('likes')">
-        Más Me gusta
-      </button>
+      <div class="header-actions">
+        <button type="button" class="btn-new-post-sm" (click)="abrirModalCrear()">
+          + Publicar
+        </button>
+
+        <!-- Menú de Usuario -->
+        <div class="user-menu-wrapper">
+          <button
+            type="button"
+            class="avatar-trigger"
+            (click)="toggleMenuUsuario($event)"
+            aria-label="Menú de usuario">
+            <img
+              [src]="avatarUsuarioActual()"
+              [alt]="usuarioActual()?.username || 'Usuario'"
+            />
+          </button>
+
+          @if (menuUsuarioAbierto()) {
+            <div class="user-dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-user-info">
+                <strong>{{ usuarioActual()?.nombre }}</strong>
+                <span>&#64;{{ usuarioActual()?.username }}</span>
+              </div>
+              <hr />
+              <a routerLink="/perfil" class="dropdown-item" (click)="cerrarMenuUsuario()">
+                Ver perfil
+              </a>
+              <button type="button" class="dropdown-item dropdown-logout" (click)="cerrarSesion()">
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   </header>
 
-  @if (cargando()) {
-    <div class="loading-state">Cargando publicaciones...</div>
-  } @else {
-    <div class="posts-list">
-      @for (item of posts(); track item._id) {
-        <app-post-card
-          [post]="item"
-          [currentUserId]="currentUserId()"
-          (likeToggled)="manejarLike($event)"
-          (deleted)="manejarEliminacion($event)"
+  <!-- CONTENIDO PRINCIPAL DEL FEED -->
+  <main class="feed-page" (click)="cerrarMenuUsuario()">
+    <section class="feed-container">
+
+      <!-- CAJA RÁPIDA PARA ABRIR EL MODAL DE CREAR PUBLICACIÓN -->
+      <div class="create-post-prompt" (click)="abrirModalCrear()">
+        <img
+          class="prompt-avatar"
+          [src]="avatarUsuarioActual()"
+          alt="Tu foto"
         />
-      } @empty {
-        <p class="empty-state">No hay publicaciones para mostrar.</p>
+        <div class="prompt-fake-input">
+          ¿Qué recuerdo, consola o juego retro querés compartir hoy, {{ usuarioActual()?.nombre || usuarioActual()?.username }}?
+        </div>
+        <button type="button" class="btn-primary prompt-btn">
+          Publicar
+        </button>
+      </div>
+
+      <!-- CONTROLES Y ORDENAMIENTO -->
+      <div class="feed-header-bar">
+        <h1>Publicaciones</h1>
+
+        <div class="tabs-nav">
+          <button
+            type="button"
+            class="tab-item"
+            [class.active]="sortBy() === 'fecha'"
+            (click)="cambiarOrden('fecha')">
+            Más recientes
+          </button>
+          <button
+            type="button"
+            class="tab-item"
+            [class.active]="sortBy() === 'likes'"
+            (click)="cambiarOrden('likes')">
+            Más Me gusta
+          </button>
+        </div>
+      </div>
+
+      <!-- LISTADO DE PUBLICACIONES -->
+      @if (cargando()) {
+        <div class="feed-status-card">
+          <div class="retro-spinner sm"></div>
+        </div>
+      } @else {
+        <div class="posts-list">
+          @for (item of posts(); track item._id) {
+            <app-post-card
+              [post]="item"
+              [currentUserId]="currentUserId()"
+              [esAdmin]="esAdmin()"
+              (likeToggled)="manejarLike($event)"
+              (deleted)="manejarEliminacion($event)"
+            />
+          } @empty {
+            <div class="feed-status-card empty">
+              <h3>Todavía no hay publicaciones</h3>
+              <p>¡Sé el primero en compartir algo con la comunidad!</p>
+              <button type="button" class="btn-primary" (click)="abrirModalCrear()">
+                Crear primera publicación
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- PAGINACIÓN (10 EN 10) -->
+        @if (totalPages() > 1) {
+          <nav class="pagination" aria-label="Paginación de publicaciones">
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="currentPage() === 1"
+              (click)="cambiarPagina(currentPage() - 1)">
+              ← Anterior
+            </button>
+
+            <span class="page-indicator">
+              Página <strong>{{ currentPage() }}</strong> de <strong>{{ totalPages() }}</strong>
+            </span>
+
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="currentPage() === totalPages()"
+              (click)="cambiarPagina(currentPage() + 1)">
+              Siguiente →
+            </button>
+          </nav>
+        }
       }
+    </section>
+  </main>
+}
+
+<!-- MODAL DE NUEVA PUBLICACIÓN CON BACKDROP SOMBREADO -->
+@if (modalCrearAbierto()) {
+  <div class="modal-backdrop" (click)="cerrarModalCrear()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Crear publicación</h2>
+        <button type="button" class="btn-close-modal" (click)="cerrarModalCrear()" aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
+
+      <form [formGroup]="postForm" (ngSubmit)="crearPublicacion()">
+        @if (errorCreacion()) {
+          <div class="alert-error">{{ errorCreacion() }}</div>
+        }
+
+        <div class="form-group">
+          <label for="titulo">Título de la publicación</label>
+          <input
+            id="titulo"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej: Mi colección de cartuchos de Sega Genesis"
+            [class.input-error]="postForm.get('titulo')?.invalid && postForm.get('titulo')?.touched"
+          />
+          @if (postForm.get('titulo')?.invalid && postForm.get('titulo')?.touched) {
+            <span class="field-error">El título es obligatorio (máx. 120 caracteres).</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            rows="4"
+            formControlName="descripcion"
+            placeholder="Contá la historia detrás de este artículo, juego o recuerdo..."
+            [class.input-error]="postForm.get('descripcion')?.invalid && postForm.get('descripcion')?.touched">
+          </textarea>
+          @if (postForm.get('descripcion')?.invalid && postForm.get('descripcion')?.touched) {
+            <span class="field-error">La descripción es obligatoria.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Imagen (opcional)</label>
+          <label class="file-upload-box post-image-upload">
+            <input type="file" accept="image/*" (change)="onImagenSeleccionada($event)" />
+            @if (imagenPreview()) {
+              <div class="post-image-preview">
+                <img [src]="imagenPreview()" alt="Vista previa" />
+                <div class="preview-actions">
+                  <span class="change-image-text">Hacé clic para cambiar la imagen</span>
+                  <button type="button" class="btn-remove-img" (click)="quitarImagen($event)">
+                    Quitar imagen
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <span class="upload-placeholder">+ Subir una foto (opcional)</span>
+              <span class="field-hint">Formatos JPG, PNG o WEBP</span>
+            }
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModalCrear()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="creandoPost()">
+            {{ creandoPost() ? 'Publicando...' : 'Publicar ahora' }}
+          </button>
+        </div>
+      </form>
     </div>
-
-    @if (totalPages() > 1) {
-      <nav class="pagination">
-        <button 
-          type="button" 
-          [disabled]="currentPage() === 1" 
-          (click)="cambiarPagina(currentPage() - 1)">
-          Anterior
-        </button>
-
-        <span>Página {{ currentPage() }} de {{ totalPages() }}</span>
-
-        <button 
-          type="button" 
-          [disabled]="currentPage() === totalPages()" 
-          (click)="cambiarPagina(currentPage() + 1)">
-          Siguiente
-        </button>
-      </nav>
-    }
-  }
-</section>
+  </div>
+}

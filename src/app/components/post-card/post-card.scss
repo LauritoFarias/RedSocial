@@ -1,0 +1,455 @@
+// ==========================================================================
+// 1. CONTENEDOR BASE DE LA TARJETA
+// ==========================================================================
+.post-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+// ==========================================================================
+// 2. CABECERA DE LA PUBLICACIÓN (AUTOR, FECHA CLICABLE Y ELIMINAR)
+// ==========================================================================
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem 1.35rem 0.75rem;
+  gap: 1rem;
+
+  .autor-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--brand-secondary-soft);
+      background-color: var(--bg-subtle);
+      flex-shrink: 0;
+    }
+
+    .autor-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .autor-names {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+
+        .nombre {
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: var(--text-main);
+        }
+
+        .username {
+          font-weight: 600;
+          font-size: 0.85rem;
+          color: var(--brand-secondary);
+        }
+      }
+
+      // Fecha clicable con subrayado en hover (estilo Facebook)
+      .fecha-link,
+      .fecha {
+        display: inline-block;
+        width: fit-content;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 0.12rem;
+        text-decoration: none;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+          color: var(--text-secondary);
+        }
+      }
+    }
+  }
+
+  .btn-delete {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: var(--color-error-bg);
+      color: var(--color-error);
+      border-color: var(--color-error-border);
+    }
+  }
+}
+
+// ==========================================================================
+// 3. CUERPO E IMAGEN OPCIONAL DE LA PUBLICACIÓN
+// ==========================================================================
+.post-body {
+  padding: 0.25rem 1.35rem 1.1rem;
+
+  .post-title {
+    margin: 0 0 0.45rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--text-main);
+    line-height: 1.35;
+  }
+
+  .post-desc {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre-line;
+    word-break: break-word;
+  }
+
+  .post-image-container {
+    margin-top: 1rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background-color: #0f172a;
+    display: flex;
+    justify-content: center;
+    max-height: 480px;
+
+    .post-image {
+      width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      display: block;
+    }
+  }
+}
+
+// ==========================================================================
+// 4. PIE DE ACCIONES (LOS BOTONES .btn-action VIENEN DE styles.scss)
+// ==========================================================================
+.post-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.7rem 1.15rem;
+  border-top: 1px solid var(--border-color);
+  background-color: #fcfdfe;
+
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+}
+
+// ==========================================================================
+// 5. SECCIÓN DE COMENTARIOS DESPLEGABLE (PAGINADOS DE 10 EN 10 Y EDITABLES)
+// ==========================================================================
+.comments-section {
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-page);
+  padding: 1.15rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: slideDownComments 0.18s ease-out;
+}
+
+@keyframes slideDownComments {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comment-composer {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+
+  @media (max-width: 520px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  textarea {
+    flex: 1;
+    background-color: var(--bg-surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    resize: vertical;
+    min-height: 44px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: var(--brand-secondary);
+      box-shadow: 0 0 0 3px var(--brand-secondary-soft);
+    }
+  }
+
+  .btn-send-comment {
+    width: auto;
+    padding: 0.65rem 1.1rem;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.95rem;
+  box-shadow: var(--shadow-sm);
+
+  .comment-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border-strong);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .comment-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+
+    .comment-author-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+
+      .comment-username {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      .comment-date {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .edited-badge {
+        font-size: 0.74rem;
+        font-style: italic;
+        font-weight: 600;
+        color: var(--brand-secondary);
+        background-color: var(--brand-secondary-soft);
+        padding: 0.05rem 0.4rem;
+        border-radius: var(--radius-full);
+      }
+    }
+
+    .btn-edit-comment {
+      background: transparent;
+      border: none;
+      color: var(--brand-secondary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+
+      &:hover {
+        background-color: var(--brand-secondary-soft);
+      }
+    }
+  }
+
+  .comment-text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    white-space: pre-line;
+    word-break: break-word;
+  }
+}
+
+.comment-edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+
+  textarea {
+    width: 100%;
+    background-color: var(--bg-page);
+    border: 1.5px solid var(--brand-secondary);
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--text-main);
+    resize: vertical;
+    outline: none;
+  }
+
+  .edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+
+    button {
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-cancel-edit {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+
+      &:hover {
+        background-color: var(--bg-subtle);
+      }
+    }
+
+    .btn-save-edit {
+      background-color: var(--brand-secondary);
+      border: none;
+      color: #ffffff;
+
+      &:hover:not(:disabled) {
+        background-color: var(--brand-secondary-hover);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.no-comments,
+.comments-loading {
+  margin: 0;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0;
+}
+
+.btn-load-more {
+  align-self: center;
+  background-color: var(--bg-surface);
+  color: var(--brand-secondary);
+  border: 1.5px solid var(--brand-secondary);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background-color: var(--brand-secondary-soft);
+  }
+}
+
+// ==========================================================================
+// 6. VARIANTE VISTA AMPLIADA (/post/:id)
+// ==========================================================================
+.post-card.is-detail {
+  .post-header {
+    padding: 1.5rem 1.75rem 1rem;
+
+    .autor-info .avatar {
+      width: 52px;
+      height: 52px;
+    }
+
+    .autor-info .autor-meta .autor-names .nombre {
+      font-size: 1.05rem;
+    }
+  }
+
+  .post-body {
+    padding: 0.35rem 1.75rem 1.5rem;
+
+    .post-title {
+      font-size: 1.55rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .post-desc {
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .post-image-container {
+      margin-top: 1.25rem;
+      max-height: 680px;
+
+      .post-image {
+        max-height: 680px;
+      }
+    }
+  }
+
+  .post-footer {
+    padding: 0.85rem 1.5rem;
+  }
+
+  .comments-section {
+    padding: 1.35rem 1.75rem;
+  }
+}

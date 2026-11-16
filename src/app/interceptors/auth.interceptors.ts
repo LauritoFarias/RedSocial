@@ -1,16 +1,24 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(AuthService).getToken();
+  const authService = inject(AuthService);
+  const token = authService.getToken();
 
-  if (token) {
-    const authReq = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` },
-    });
-    return next(authReq);
-  }
+  const peticionClonada =
+    token && !req.headers.has('Authorization')
+      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : req;
 
-  return next(req);
+  return next(peticionClonada).pipe(
+    catchError((error: HttpErrorResponse) => {
+      const esRutaLogin = req.url.includes('/auth/login');
+      if (error.status === 401 && !esRutaLogin) {
+        authService.logout();
+      }
+      return throwError(() => error);
+    }),
+  );
 };
